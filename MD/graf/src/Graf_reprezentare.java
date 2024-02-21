@@ -53,7 +53,7 @@ public class Graf_reprezentare {
     // Afisare meniu
     private static void printMenu() {
         System.out.println("----- Menu -----");
-        System.out.println("1. Adaugare arcuri");
+        System.out.println("1. Adaugare arcuri noi");
         System.out.println("2. Afisare graf");
         System.out.println("3. Afisare matrice de incidenta");
         System.out.println("4. Afisare matrice de adiacenta");
@@ -64,19 +64,44 @@ public class Graf_reprezentare {
         System.out.print("Enter optiunea --> ");
     }
 
-    // Metoda pentru a adauga noduri noi
     private static void addEdge(Graph<Integer, DefaultEdge> graph) {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Introduce arcul de inceput: ");
-        int source = scanner.nextInt(); // nodul sursa
-        System.out.print("Introduce arcul de sfarsit: ");
-        int target = scanner.nextInt(); // nodul destinatie
-        graph.addVertex(source); // adaugam nodul sursa
-        graph.addVertex(target); // adaugam nodul destinatieS
-        graph.addEdge(source, target); // adaugam arcul dintre nodul sursa si destinatie
-        System.out.println("Arcul nou adaugat: (" + source + ", " + target + ")");
-    }
-
+        System.out.print("Dati numarul de noduri ce vrei sa citesti: ");
+        int numVertices = scanner.nextInt(); 
+    
+        for (int i = 0; i < numVertices; i++) {
+            System.out.print("enter nodul: ");
+            int vertex = scanner.nextInt(); 
+            graph.addVertex(vertex); 
+            System.out.println("nodul adaugat: " + vertex);
+        }
+    
+        System.out.print("Dati numarul de arcuri ce vrei sa citesti: ");
+        int numEdges = scanner.nextInt(); 
+    
+        for (int i = 0; i < numEdges; i++) {
+            System.out.print("arcul de inceput: ");
+            int source = scanner.nextInt(); 
+            System.out.print("nodul final: ");
+            int target = scanner.nextInt(); 
+            if (!graph.containsEdge(source, target)) {
+                graph.addEdge(source, target); 
+                System.out.println("arcul adaugat cu succes: (" + source + ", " + target + ")");
+            } else {
+                System.out.println("Arcul (" + source + ", " + target + ") există deja în graf.");
+            }
+            if (source == target) {
+                if (!graph.containsEdge(source, source)) {
+                    graph.addEdge(source, source); 
+                    System.out.println("arcul adaugat cu succes: (" + source + ", " + source + ")");
+                } else {
+                    System.out.println("Arcul (" + source + ", " + source + ") există deja în graf.");
+                }
+            }
+        }
+    }    
+    
+    
     // Metoda pentru a sterge o legatura dintre noduri
     private static void deleteEdge(Graph<Integer, DefaultEdge> graph) {
         Scanner scanner = new Scanner(System.in);
@@ -134,7 +159,11 @@ public class Graf_reprezentare {
                     System.out.print("-1 ");
                 } else if (vertex.equals(target)) {
                     System.out.print("1 ");
-                } else {
+                } 
+                    else if (vertex.equals(source)) {
+                        System.out.println("2");
+                    }
+                else {
                     System.out.print("0 ");
                 }
             }
