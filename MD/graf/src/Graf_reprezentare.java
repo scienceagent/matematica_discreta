@@ -2,13 +2,7 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 public class Graf_reprezentare {
 
@@ -47,9 +41,11 @@ public class Graf_reprezentare {
                 case 8: // New case for depth-first traversal
                     depthFirstTraversal(graph);
                     break;
-
                 case 9: // New case for breadth-first traversal
                     breadthFirstTraversal(graph);
+                    break;
+                case 10: // New case for determining the covering graph
+                    determineCoveringGraph(graph);
                     break;
                 case 0:
                     System.out.println("STOP program (tasta 0 )!");
@@ -73,6 +69,7 @@ public class Graf_reprezentare {
         System.out.println("7. Sterge nod");
         System.out.println("8. Parcurgerea grafului in adancime");
         System.out.println("9. Parcurgerea grafului in lungime");
+        System.out.println("10. Determinare graf de acoperire");
         System.out.println("0. Exit");
         System.out.print("Enter optiunea --> ");
     }
@@ -153,31 +150,46 @@ public class Graf_reprezentare {
     // 1, dacă nodul i este extremitatea finală a arcului j;
     // -1, dacă nodul i este extremitatea iniţială a arcului j;
     // 0, dacă nodul i nu este extremitate a arcului j.
-    private static void displayIncidenceMatrix(Graph<Integer, DefaultEdge> graph) {
-        System.out.println("Matricea de incidenta:");
-        // Declaram o lista
-        List<DefaultEdge> edges = new ArrayList<>(graph.edgeSet());
-        // Parcugem nodurile grafului
-        for (Integer vertex : graph.vertexSet()) {
-            // Parcurgem arcurile
-            for (DefaultEdge edge : edges) {
-                // Declaram nodul sursa si destinatie
-                Integer source = graph.getEdgeSource(edge);
-                Integer target = graph.getEdgeTarget(edge);
-                // Verificam conditia
-                if (vertex.equals(source)) {
-                    System.out.print("-1 ");
-                } else if (vertex.equals(target)) {
-                    System.out.print("1 ");
-                } else if (vertex.equals(source)) {
-                    System.out.println("2");
-                } else {
-                    System.out.print("0 ");
-                }
+   // Metoda pentru afișarea matricei de incidență
+   private static void displayIncidenceMatrix(Graph<Integer, DefaultEdge> graph) {
+    System.out.println("Matricea de incidență:");
+
+    // Inițializați o matrice pentru a stoca matricea de incidență
+    int[][] incidenceMatrix = new int[graph.vertexSet().size()][graph.vertexSet().size()];
+
+    // Parcurgeți fiecare vârf din graf
+    int vertexIndex = 0;
+    for (Integer vertex : graph.vertexSet()) {
+        // Parcurgeți fiecare muchie din graf
+        int edgeIndex = 0;
+        for (DefaultEdge edge : graph.edgeSet()) {
+            // Obțineți nodurile sursă și destinație ale muchiei
+            Integer source = graph.getEdgeSource(edge);
+            Integer target = graph.getEdgeTarget(edge);
+
+            // Verificați dacă vârful curent este extremitatea inițială sau finală a muchiei și actualizați matricea de incidență corespunzător
+            if (vertex.equals(source)) {
+                incidenceMatrix[vertexIndex][edgeIndex] = -1;
+            } else if (vertex.equals(target)) {
+                incidenceMatrix[vertexIndex][edgeIndex] = 1;
+            } else {
+                incidenceMatrix[vertexIndex][edgeIndex] = 0;
             }
-            System.out.println();
+            edgeIndex++;
         }
+        vertexIndex++;
     }
+
+    // Afișați matricea de incidență
+    for (int[] row : incidenceMatrix) {
+        for (int value : row) {
+            System.out.print(value + " ");
+        }
+        System.out.println();
+    }
+}
+
+
 
     // Metoda de afisare a matricei de adiacenta
     private static void displayAdjacencyMatrix(Graph<Integer, DefaultEdge> graph) {
@@ -230,7 +242,7 @@ public class Graf_reprezentare {
     }
 
     private static void depthFirstTraversalHelper(Graph<Integer, DefaultEdge> graph, int currentVertex,
-            Set<Integer> visited) {
+                                                  Set<Integer> visited) {
         if (!visited.contains(currentVertex)) {
             System.out.println(currentVertex + " ");
             visited.add(currentVertex);
@@ -269,4 +281,44 @@ public class Graf_reprezentare {
             }
         }
     }
+
+  // Metoda determinarii grafului de acoperire
+private static void determineCoveringGraph(Graph<Integer, DefaultEdge> graph) {
+    Scanner scanner = new Scanner(System.in);
+    System.out.println("Nodul de startare:");
+    int startVertex = scanner.nextInt();
+
+    Set<Integer> visited = new HashSet<>();
+    Queue<Integer> queue = new LinkedList<>();
+
+    visited.add(startVertex);
+    queue.add(startVertex);
+
+    // construim graful de acoperire
+    Graph<Integer, DefaultEdge> coveringGraph = new SimpleGraph<>(DefaultEdge.class);
+    coveringGraph.addVertex(startVertex);
+
+    while (!queue.isEmpty()) {
+        int currentVertex = queue.poll();
+
+        for (DefaultEdge edge : graph.edgesOf(currentVertex)) {
+            Integer neighbor = graph.getEdgeSource(edge).equals(currentVertex) ? graph.getEdgeTarget(edge)
+                    : graph.getEdgeSource(edge);
+            if (!visited.contains(neighbor)) {
+                visited.add(neighbor);
+                queue.add(neighbor);
+                coveringGraph.addVertex(neighbor);
+                coveringGraph.addEdge(currentVertex, neighbor);
+            }
+        }
+    }
+
+    System.out.println("Graficul de acoperire pornind de la nodul " + startVertex + " este:");
+    System.out.println(coveringGraph);
+
+
+    displayAdjacencyList(coveringGraph);
+    displayIncidenceMatrix(coveringGraph);
+    displayAdjacencyMatrix(coveringGraph);
+}
 }
