@@ -6,4 +6,4 @@
 
 **Group:** TI-231
 
-**Professor:** Ciobanu Ecaterina
+**Professor:** Ceban Gheorghi/Ciobanu Ecaterina
